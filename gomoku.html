@@ -35,13 +35,13 @@
     .turnStone.black { background: #000; }
     .turnStone.white { background: #fff; }
 
-    /* 胜利弹窗 */
+    /* Winner Popup */
     .overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
     .overlayContent { background:#fff; padding:30px 40px; border-radius:12px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.3); }
     .overlayContent h2 { margin:0 0 16px; font-size:22px; }
     .overlayContent button { padding:8px 16px; margin-top:12px; }
 
-    /* 对局历史列表 */
+    /* Game History List */
     .gameHistoryList { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 5px; margin-bottom: 12px; }
     .historyItem { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .historyItem:hover { background-color: #f0f0f0; border-color: #aaa; }
@@ -110,7 +110,7 @@
     </div>
   </div>
 
-  <!-- 胜利提示弹窗 -->
+  <!-- Winner Popup -->
   <div class="overlay" id="winnerOverlay">
     <div class="overlayContent">
       <h2 id="winnerText">Winner!</h2>
@@ -119,18 +119,18 @@
   </div>
 
 <script>
-// ======= 全局状态 =======
-let size=15;           // 棋盘大小（行列数）
-let board=[];          // 棋面：'.' 空、'X' 黑、'O' 白
-let turn='X';          // 当前手：'X' 或 'O'
-const history=[];      // 落子历史 [{r,c,who}]
+// ======= Global State =======
+let size=15;           // Board size (rows and columns)
+let board=[];          // Board state: '.' empty, 'X' black, 'O' white
+let turn='X';          // Current turn: 'X' or 'O'
+const history=[];      // Move history [{r,c,who}]
 let gameOver = false;
-// --- 回放状态 ---
+// --- Replay State ---
 let isReplaying = false;
 let replayHistory = [];
 let replayStep = -1;
 
-// DOM 引用
+// DOM References
 const boardEl=document.getElementById('board');
 const txt=document.getElementById('txt');
 const sizeInput=document.getElementById('sizeInput');
@@ -146,14 +146,14 @@ const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 const saveGameBtn = document.getElementById('saveGameBtn');
 const replayControlsEl = document.getElementById('replayControls');
 
-// 文案
+// i18n Strings
 const i18n={
   CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放"},
   EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay"},
   JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了"}
 };
 
-// ======= 语言 & UI =======
+// ======= Language & UI =======
 function setLanguage(lang){
   const L=i18n[lang];
   document.getElementById('title').textContent=L.title;
@@ -175,13 +175,13 @@ function setLanguage(lang){
   updateTurn();
 }
 
-// ======= 棋盘核心 =======
+// ======= Board Core =======
 function initBoard(n){
-  if (isReplaying) exitReplay(); // 如果在回放中新建，则先退出回放
+  if (isReplaying) exitReplay(); // If creating a new board during replay, exit replay first
   size=n;
-  // 更新 CSS 变量，确保容器宽高随尺寸变化
+  // Update CSS variables to ensure container dimensions change with size
   document.documentElement.style.setProperty('--size', String(n));
-  // 清空并初始化
+  // Clear and initialize
   board=Array.from({length:n},()=>Array.from({length:n},()=>'.'));
   history.length=0;
   turn='X';
@@ -197,7 +197,7 @@ function updateTurn(){
   if (isReplaying) {
     const total = replayHistory.length;
     const stepInfo = (replayStep >= 0 && replayStep < total) ? `(${replayStep + 1}/${total})` : `(0/${total})`;
-    turnBadge.textContent = `回放中 ${stepInfo}`;
+    turnBadge.textContent = `Replaying ${stepInfo}`;
     return;
   }
   const L=i18n[langSelect.value];
@@ -214,7 +214,7 @@ function renderBoard(renderData = { board, history }){
   const HALF=CELL/2;
   const INNER=(size-1)*CELL;
 
-  // 细线（不含边框）
+  // Thin lines (excluding borders)
   for(let i=1;i<size-1;i++){
     const y=i*CELL+HALF;
     const x=i*CELL+HALF;
@@ -233,7 +233,7 @@ function renderBoard(renderData = { board, history }){
     boardEl.appendChild(vLine);
   }
 
-  // 边框
+  // Borders
   const topBorder=document.createElement('div');
   topBorder.className='line border h';
   topBorder.style.left=HALF+'px';
@@ -262,7 +262,7 @@ function renderBoard(renderData = { board, history }){
   rightBorder.style.height=INNER+'px';
   boardEl.appendChild(rightBorder);
 
-  // 坐标标注（上：A..，左：1..）
+  // Coordinate labels (Top: A.., Left: 1..)
   for(let i=0;i<size;i++){
     const labelTop=document.createElement('div');
     labelTop.className='coordLabel';
@@ -279,7 +279,7 @@ function renderBoard(renderData = { board, history }){
     boardEl.appendChild(labelLeft);
   }
 
-  // 棋子（带步骤序号）
+  // Stones (with step numbers)
   for(let r=0;r<size;r++){
     for(let c=0;c<size;c++){
       const val=renderData.board[r][c];
@@ -299,7 +299,7 @@ function renderBoard(renderData = { board, history }){
     }
   }
 
-  // 点击区（每格一个）
+  // Clickable areas (one per cell)
   for(let r=0;r<size;r++){
     for(let c=0;c<size;c++){
       const area=document.createElement('div');
@@ -316,14 +316,14 @@ function renderBoard(renderData = { board, history }){
 }
 
 function onCellClick(e){
-  if(isReplaying || gameOver || overlay.style.display==='flex') return; // 回放、游戏结束、弹窗时禁手
+  if(isReplaying || gameOver || overlay.style.display==='flex') return; // Disable moves during replay, game over, or when a popup is shown
   const r=+e.currentTarget.dataset.r;
   const c=+e.currentTarget.dataset.c;
   if(board[r][c]!=='.') return;
   placeStone(r,c,turn);
   if(checkWin(r,c,turn)){
     gameOver = true;
-    saveGameBtn.style.display = 'inline-block'; // 显示保存按钮
+    saveGameBtn.style.display = 'inline-block'; // Show save button
     const L=i18n[langSelect.value];
     overlayText.textContent=(turn==='X'?L.winX:L.winO);
     overlay.style.display='flex';
@@ -345,8 +345,8 @@ function undo(){
   const last=history.pop();
   if(!last) return;
   board[last.r][last.c]='.';
-  turn=last.who; // 轮到刚下的那方
-  gameOver = false; // 撤销后，游戏可以继续
+  turn=last.who; // It's the turn of the player who just moved
+  gameOver = false; // After undo, the game can continue
   saveGameBtn.style.display = 'none';
   hideWinner();
   renderBoard();
@@ -365,7 +365,7 @@ function checkWin(r,c,who){
   return false;
 }
 
-// ======= 文本互转 / 文件 =======
+// ======= Text Conversion / File I/O =======
 function boardToText(){
   const boardStr = board.map(row=>row.join('')).join('\n');
   if (history.length === 0) return boardStr;
@@ -439,7 +439,7 @@ function loadFile(file){
 
 function hideWinner(){ overlay.style.display='none'; }
 
-// ======= 对局历史 & 回放 (localStorage) =======
+// ======= Game History & Replay (localStorage) =======
 function getSavedGames(){
   return JSON.parse(localStorage.getItem('gomokuGames') || '[]');
 }
@@ -459,7 +459,7 @@ function saveCurrentGame(){
   });
   localStorage.setItem('gomokuGames', JSON.stringify(games));
   renderGameHistory();
-  saveGameBtn.style.display = 'none'; // 保存后隐藏，防重
+  saveGameBtn.style.display = 'none'; // Hide after saving to prevent duplicates
 }
 
 function renderGameHistory(){
@@ -504,7 +504,7 @@ function startReplay(gameIndex) {
   
   document.documentElement.style.setProperty('--size', String(n));
   
-  // 切换UI
+  // Switch UI
   document.getElementById('mainControls').style.display = 'none';
   replayControlsEl.style.display = 'flex';
   
@@ -517,11 +517,11 @@ function exitReplay() {
   replayHistory = [];
   replayStep = -1;
 
-  // 切换UI
+  // Switch UI
   document.getElementById('mainControls').style.display = 'flex';
   replayControlsEl.style.display = 'none';
   
-  initBoard(parseInt(sizeInput.value) || 15); // 回到初始状态
+  initBoard(parseInt(sizeInput.value) || 15); // Return to initial state
 }
 
 function renderReplayStep() {
@@ -553,7 +553,7 @@ function replayGoTo(target) {
   renderReplayStep();
 }
 
-// ======= 事件绑定 =======
+// ======= Event Listeners =======
 newBoardBtn.onclick=()=>{ const n=parseInt(sizeInput.value)||15; initBoard(n); };
 undoBtn.onclick=undo;
 saveGameBtn.onclick = saveCurrentGame;
@@ -567,7 +567,7 @@ document.getElementById('copyBtn').onclick=async()=>{ try{ await navigator.clipb
 closeOverlayBtn.onclick=hideWinner;
 window.addEventListener('keydown',e=>{ if(e.key==='Escape') hideWinner(); });
 
-// --- 回放事件绑定 ---
+// --- Replay Event Listeners ---
 document.getElementById('replayStartBtn').onclick = () => replayGoTo('start');
 document.getElementById('replayPrevBtn').onclick = () => replayStepChange(-1);
 document.getElementById('replayNextBtn').onclick = () => replayStepChange(1);
@@ -575,7 +575,7 @@ document.getElementById('replayEndBtn').onclick = () => replayGoTo('end');
 document.getElementById('replayExitBtn').onclick = exitReplay;
 
 
-// ======= 初始化 =======
+// ======= Initialization =======
 initBoard(15);
 setLanguage('CN');
 renderGameHistory();
