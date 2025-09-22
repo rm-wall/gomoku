@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>五子棋（纯文本保存/载入）</title>
+  <title>Gomoku (Save/Load as Plain Text)</title>
   <style>
     :root { --size: 15; --cell: 36px; }
     body { margin: 0; padding: 16px; box-sizing: border-box; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: #f5f5f5; color: #222; }
@@ -51,11 +51,11 @@
 </head>
 <body>
   <header>
-    <h1 id="title">五子棋（纯文本保存 / 载入）</h1>
+    <h1 id="title">Gomoku (Save/Load as Plain Text)</h1>
     <div class="langSelectBox">
       <select id="langSelect">
         <option value="CN">中文</option>
-        <option value="EN">English</option>
+        <option value="EN" selected>English</option>
         <option value="JP">日本語</option>
       </select>
     </div>
@@ -64,18 +64,18 @@
   <div class="app">
     <div class="left">
       <div class="toolbar" id="mainControls">
-        <label id="sizeLabel">棋盘大小：<input id="sizeInput" type="number" min="5" max="40" step="1" value="15"></label>
-        <button id="newBoardBtn">新建棋盘</button>
-        <span class="badge" id="turnBadge"><span class="turnStone black"></span> 先手：黑(X)</span>
-        <button id="undoBtn">悔棋</button>
-        <button id="saveGameBtn" style="display:none;">保存对局</button>
+        <label id="sizeLabel">Board size:<input id="sizeInput" type="number" min="5" max="40" step="1" value="15"></label>
+        <button id="newBoardBtn">New Board</button>
+        <span class="badge" id="turnBadge"><span class="turnStone black"></span> Turn: Black (X)</span>
+        <button id="undoBtn">Undo</button>
+        <button id="saveGameBtn" style="display:none;">Save Game</button>
       </div>
       <div class="toolbar" id="replayControls" style="display:none;">
         <button id="replayStartBtn">|&lt;</button>
         <button id="replayPrevBtn">&lt;</button>
         <button id="replayNextBtn">&gt;</button>
         <button id="replayEndBtn">&gt;|</button>
-        <button id="replayExitBtn">退出回放</button>
+        <button id="replayExitBtn">Exit Replay</button>
       </div>
       <div class="boardWrap">
         <div id="board" class="board"></div>
@@ -84,27 +84,27 @@
 
     <div class="side">
       <div class="panel">
-        <h2 id="textPanelTitle">纯文本表示</h2>
+        <h2 id="textPanelTitle">Plain Text</h2>
         <textarea id="txt" class="txt" spellcheck="false"></textarea>
         <div class="row">
-          <button id="syncFromBoardBtn">棋盘 → 文本</button>
-          <button id="syncToBoardBtn">文本 → 棋盘</button>
-          <button id="copyBtn">复制文本</button>
+          <button id="syncFromBoardBtn">Board → Text</button>
+          <button id="syncToBoardBtn">Text → Board</button>
+          <button id="copyBtn">Copy Text</button>
         </div>
       </div>
       <div class="panel">
-        <h2 id="filePanelTitle">保存 / 载入文件</h2>
+        <h2 id="filePanelTitle">Save / Load File</h2>
         <div class="row">
-          <button id="downloadBtn">下载为 .txt</button>
+          <button id="downloadBtn">Download .txt</button>
           <input id="fileInput" type="file" accept=".txt" />
-          <button id="loadFileBtn">载入所选文件</button>
+          <button id="loadFileBtn">Load File</button>
         </div>
       </div>
       <div class="panel">
-        <h2 id="historyPanelTitle">对局历史 (localStorage)</h2>
+        <h2 id="historyPanelTitle">Game History (localStorage)</h2>
         <div id="gameHistoryList" class="gameHistoryList"></div>
         <div class="row">
-          <button id="clearHistoryBtn">清空历史</button>
+          <button id="clearHistoryBtn">Clear History</button>
         </div>
       </div>
     </div>
@@ -148,14 +148,15 @@ const replayControlsEl = document.getElementById('replayControls');
 
 // i18n Strings
 const i18n={
-  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放"},
-  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay"},
-  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了"}
+  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜"},
+  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins"},
+  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち"}
 };
 
 // ======= Language & UI =======
 function setLanguage(lang){
   const L=i18n[lang];
+  document.title = L.title; // Update page title
   document.getElementById('title').textContent=L.title;
   document.getElementById('sizeLabel').firstChild.textContent=L.size;
   newBoardBtn.textContent=L.newBoard;
@@ -173,6 +174,9 @@ function setLanguage(lang){
   clearHistoryBtn.textContent = L.clearHistory;
   document.getElementById('replayExitBtn').textContent = L.replayExit;
   updateTurn();
+  renderGameHistory();
+  localStorage.setItem('gomokuLang', lang); // Save language preference
+  langSelect.value = lang; // Ensure dropdown is in sync
 }
 
 // ======= Board Core =======
@@ -464,9 +468,10 @@ function saveCurrentGame(){
 
 function renderGameHistory(){
   const games = getSavedGames();
+  const L = i18n[langSelect.value] || i18n.EN;
   gameHistoryListEl.innerHTML = '';
   if (games.length === 0) {
-    gameHistoryListEl.innerHTML = '<p>暂无历史对局</p>';
+    gameHistoryListEl.innerHTML = `<p>${L.noHistory}</p>`;
     return;
   }
   games.forEach((game, index) => {
@@ -474,7 +479,7 @@ function renderGameHistory(){
     item.className = 'historyItem';
     item.innerHTML = `
       <strong>${game.date}</strong>
-      <span>${game.boardSize}x${game.boardSize} / ${game.totalMoves}手 / ${game.winner}胜</span>
+      <span>${game.boardSize}x${game.boardSize} / ${game.totalMoves}${L.moves} / ${game.winner}${L.wins}</span>
     `;
     item.onclick = () => startReplay(index);
     gameHistoryListEl.appendChild(item);
@@ -482,7 +487,8 @@ function renderGameHistory(){
 }
 
 function clearGameHistory(){
-  if (confirm('确定要清空所有对局历史吗？')) {
+  const L = i18n[langSelect.value] || i18n.EN;
+  if (confirm(L.clearHistoryConfirm)) {
     localStorage.removeItem('gomokuGames');
     renderGameHistory();
   }
@@ -576,9 +582,12 @@ document.getElementById('replayExitBtn').onclick = exitReplay;
 
 
 // ======= Initialization =======
-initBoard(15);
-setLanguage('CN');
-renderGameHistory();
+function initializeApp() {
+  const savedLang = localStorage.getItem('gomokuLang') || 'EN';
+  initBoard(15);
+  setLanguage(savedLang);
+}
+initializeApp();
 </script>
 </body>
 </html>
