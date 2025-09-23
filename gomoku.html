@@ -35,6 +35,15 @@
     .turnStone.black { background: #000; }
     .turnStone.white { background: #fff; }
 
+    .center-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #000;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
     /* Winner Popup */
     .overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
     .overlayContent { background:#fff; padding:30px 40px; border-radius:12px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.3); }
@@ -265,6 +274,18 @@ function renderBoard(renderData = { board, history }){
   rightBorder.style.left=((size-1)*CELL+HALF)+'px';
   rightBorder.style.height=INNER+'px';
   boardEl.appendChild(rightBorder);
+
+  // Draw a center dot for visual reference, common on physical boards.
+  // This is only drawn on odd-sized boards where a true center intersection exists.
+  if (size % 2 !== 0) {
+    const centerIdx = (size - 1) / 2;
+    const centerPos = centerIdx * CELL + HALF;
+    const dot = document.createElement('div');
+    dot.className = 'center-dot';
+    dot.style.left = centerPos + 'px';
+    dot.style.top = centerPos + 'px';
+    boardEl.appendChild(dot);
+  }
 
   // Coordinate labels (Top: A.., Left: 1..)
   for(let i=0;i<size;i++){
