@@ -356,13 +356,13 @@ function onCellClick(e){
   }
   turn=(turn==='X')?'O':'X';
   updateTurn();
-  syncTextFromBoard();
 }
 
 function placeStone(r,c,who){
   board[r][c]=who;
   history.push({r,c,who});
   renderBoard();
+  syncTextFromBoard();
 }
 
 function undo(){
@@ -391,10 +391,10 @@ function checkWin(r,c,who){
 }
 
 // ======= Text Conversion / File I/O =======
-function boardToText(){
-  const boardStr = board.map(row=>row.join('')).join('\n');
-  if (history.length === 0) return boardStr;
-  const historyStr = history.map(h => `${h.who},${h.r},${h.c}`).join('\n');
+function boardToText(b = board, h = history){
+  const boardStr = b.map(row=>row.join('')).join('\n');
+  if (h.length === 0) return boardStr;
+  const historyStr = h.map(h => `${h.who},${h.r},${h.c}`).join('\n');
   return `${boardStr}\n---\n${historyStr}`;
 }
 
@@ -421,7 +421,7 @@ function textToBoard(text){
   return {n, grid, newHistory};
 }
 
-function syncTextFromBoard(){ txt.value=boardToText(); }
+function syncTextFromBoard(b = board, h = history){ txt.value=boardToText(b, h); }
 
 function syncBoardFromText(){
   if (isReplaying) exitReplay();
@@ -545,6 +545,7 @@ function startReplay(gameIndex) {
   
   // Directly render the final board state using the parsed grid and full history
   renderBoard({ board: grid, history: newHistory });
+  syncTextFromBoard(grid, newHistory);
   updateTurn();
 }
 
@@ -569,6 +570,7 @@ function renderReplayStep() {
   }
   
   renderBoard({ board: tempBoard, history: tempHistory });
+  syncTextFromBoard(tempBoard, tempHistory);
   updateTurn();
 }
 
