@@ -14,6 +14,7 @@
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
     input[type="number"], input[type="file"], button, select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid #aaa; background: #fff; color: #222; }
     button { cursor: pointer; }
+    button:disabled { background-color: #f0f0f0; color: #aaa; cursor: not-allowed; }
     .boardWrap { background: #fff; padding: 32px; border-radius: 8px; border: 1px solid #ccc; }
     .board { position: relative; width: calc(var(--size) * var(--cell)); height: calc(var(--size) * var(--cell)); background: #fdfdfd; }
     .line { position: absolute; background: #000; }
@@ -106,7 +107,7 @@
         <div class="row">
           <button id="downloadBtn">Download .txt</button>
           <input id="fileInput" type="file" accept=".txt" />
-          <button id="loadFileBtn">Load File</button>
+          <button id="loadFileBtn" disabled>Load File</button>
         </div>
       </div>
       <div class="panel">
@@ -600,6 +601,11 @@ document.getElementById('syncFromBoardBtn').onclick=syncTextFromBoard;
 document.getElementById('syncToBoardBtn').onclick=syncBoardFromText;
 document.getElementById('downloadBtn').onclick=downloadTxt;
 document.getElementById('loadFileBtn').onclick=()=>{ const f=document.getElementById('fileInput').files[0]; if(f) loadFile(f); };
+document.getElementById('fileInput').addEventListener('change', () => {
+  const fileInput = document.getElementById('fileInput');
+  const loadFileBtn = document.getElementById('loadFileBtn');
+  loadFileBtn.disabled = fileInput.files.length === 0;
+});
 document.getElementById('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(txt.value); } catch(e){ txt.select(); document.execCommand('copy'); } };
 closeOverlayBtn.onclick=hideWinner;
 window.addEventListener('keydown',e=>{ if(e.key==='Escape') hideWinner(); });
