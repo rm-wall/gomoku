@@ -456,14 +456,13 @@ function downloadTxt(){
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
   const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
-  const blob=new Blob([boardToText()],{type:'text/plain'});
+  const blob=new Blob([txt.value],{type:'text/plain'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url; a.download=`gomoku_${size}x${size}_${timestamp}.txt`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 function loadFile(file){
   const reader=new FileReader();
   reader.onload=()=>{ txt.value=reader.result; syncBoardFromText(); };
