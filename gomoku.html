@@ -92,12 +92,15 @@
 <body>
   <header>
     <h1 id="title">Gomoku (Save/Load as Plain Text)</h1>
-    <div class="langSelectBox">
-      <select id="langSelect">
-        <option value="EN" selected>English</option>
-        <option value="JP">日本語</option>
-        <option value="CN">中文</option>
-      </select>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div id="lastModified" style="font-size: 12px; color: #555; text-align: right;"></div>
+      <div class="langSelectBox">
+        <select id="langSelect">
+          <option value="EN" selected>English</option>
+          <option value="JP">日本語</option>
+          <option value="CN">中文</option>
+        </select>
+      </div>
     </div>
   </header>
 
@@ -200,12 +203,23 @@ const replayControlsEl = document.getElementById('replayControls');
 
 // i18n Strings
 const i18n={
-  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑",turnO:"轮到：白",winX:"黑方获胜!",winO:"白方获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空所有历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜", inProgress:"进行中", delete:"删除", deleteConfirm:"确定要删除这个对局吗？", blackWins:"黑方胜", whiteWins:"白方胜", kifuPanel:"棋谱库", loadKifu:"载入棋谱"},
-  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black",turnO:"Turn: White",winX:"Black wins!",winO:"White wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear All History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins", inProgress:"In Progress", delete:"Delete", deleteConfirm:"Are you sure you want to delete this game?", blackWins:"Black Wins", whiteWins:"White Wins", kifuPanel:"Kifu Library", loadKifu:"Load Kifu"},
-  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒",turnO:"次：白",winX:"黒 勝ち!",winO:"白 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"全履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち", inProgress:"進行中", delete:"削除", deleteConfirm:"この対局を削除してもよろしいですか？", blackWins:"黒勝ち", whiteWins:"白勝ち", kifuPanel:"棋譜ライブラリ", loadKifu:"棋譜を読み込み"}
+  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑",turnO:"轮到：白",winX:"黑方获胜!",winO:"白方获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空所有历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜", inProgress:"进行中", delete:"删除", deleteConfirm:"确定要删除这个对局吗？", blackWins:"黑方胜", whiteWins:"白方胜", kifuPanel:"棋谱库", loadKifu:"载入棋谱", lastModified:"最后修改时间："},
+  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black",turnO:"Turn: White",winX:"Black wins!",winO:"White wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear All History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins", inProgress:"In Progress", delete:"Delete", deleteConfirm:"Are you sure you want to delete this game?", blackWins:"Black Wins", whiteWins:"White Wins", kifuPanel:"Kifu Library", loadKifu:"Load Kifu", lastModified:"Last Modified: "},
+  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒",turnO:"次：白",winX:"黒 勝ち!",winO:"白 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"全履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち", inProgress:"進行中", delete:"削除", deleteConfirm:"この対局を削除してもよろしいですか？", blackWins:"黒勝ち", whiteWins:"白勝ち", kifuPanel:"棋譜ライブラリ", loadKifu:"棋譜を読み込み", lastModified:"最終更新日時："}
 };
 
 // ======= Language & UI =======
+function updateLastModified(lang) {
+  const lastModifiedEl = document.getElementById('lastModified');
+  if (document.lastModified && lastModifiedEl) {
+    const lastModifiedDate = new Date(document.lastModified);
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    // Use 'undefined' to let toLocaleString use the browser's default locale
+    const formattedDate = lastModifiedDate.toLocaleString(undefined, options);
+    lastModifiedEl.textContent = `${i18n[lang].lastModified}${formattedDate}`;
+  }
+}
+
 function setLanguage(lang){
   const L=i18n[lang];
   document.title = L.title; // Update page title
@@ -229,6 +243,7 @@ function setLanguage(lang){
   document.getElementById('loadKifuBtn').textContent = L.loadKifu;
   updateTurn();
   renderGameHistory();
+  updateLastModified(lang); // Update last modified time with correct language
   localStorage.setItem('gomokuLang', lang); // Save language preference
   langSelect.value = lang; // Ensure dropdown is in sync
 }
