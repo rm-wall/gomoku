@@ -26,6 +26,17 @@
     .stone { position: absolute; width: 24px; height: 24px; border-radius: 50%; transform: translate(-50%, -50%); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:#fff; }
     .stone.O { color:#000; background: #fff; border: 1px solid #000; }
     .stone.X { background: #000; }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.7);
+      }
+      100% {
+        box-shadow: 0 0 0 6px rgba(255, 0, 0, 0);
+      }
+    }
+    .stone.last-move {
+      animation: pulse 1.2s infinite;
+    }
     .coordLabel { position: absolute; font-size: 12px; color: #000; user-select: none; pointer-events: none; }
     .side-panels { display: grid; gap: 12px; }
     .side { display: grid; gap: 12px; }
@@ -256,6 +267,7 @@ function renderBoard(renderData = { board, history }){
   const CELL=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
   const HALF=CELL/2;
   const INNER=(size-1)*CELL;
+  const lastMove = renderData.history.length > 0 ? renderData.history[renderData.history.length - 1] : null;
 
   // Thin lines (excluding borders)
   for(let i=1;i<size-1;i++){
@@ -348,6 +360,9 @@ function renderBoard(renderData = { board, history }){
           const tag=document.createElement('span');
           tag.textContent=String(idx+1);
           s.appendChild(tag);
+        }
+        if (lastMove && r === lastMove.r && c === lastMove.c) {
+          s.classList.add('last-move');
         }
         boardEl.appendChild(s);
       }
