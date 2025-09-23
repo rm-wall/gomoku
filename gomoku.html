@@ -711,7 +711,8 @@ document.getElementById('loadKifuBtn').onclick = () => {
       return response.text();
     })
     .then(data => {
-      setupReplay(data);
+      txt.value = data;
+      syncBoardFromText();
     })
     .catch(e => {
       console.error('Error loading kifu file:', e);
