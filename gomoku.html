@@ -158,9 +158,9 @@ const replayControlsEl = document.getElementById('replayControls');
 
 // i18n Strings
 const i18n={
-  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜"},
-  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins"},
-  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち"}
+  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜", inProgress:"进行中"},
+  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins", inProgress:"In Progress"},
+  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち", inProgress:"進行中"}
 };
 
 // ======= Language & UI =======
@@ -355,6 +355,9 @@ function onCellClick(e){
     overlay.style.display='flex';
     return;
   }
+  if (history.length === 1) {
+    saveGameBtn.style.display = 'inline-block';
+  }
   turn=(turn==='X')?'O':'X';
   updateTurn();
 }
@@ -373,7 +376,7 @@ function undo(){
   board[last.r][last.c]='.';
   turn=last.who; // It's the turn of the player who just moved
   gameOver = false; // After undo, the game can continue
-  saveGameBtn.style.display = 'none';
+  saveGameBtn.style.display = history.length > 0 ? 'inline-block' : 'none';
   hideWinner();
   renderBoard();
   updateTurn();
@@ -481,7 +484,8 @@ function saveCurrentGame(){
   const games = getSavedGames();
   const gameData = boardToText();
   const date = new Date();
-  const winner = turn;
+  const L = i18n[langSelect.value] || i18n.EN;
+  const winner = gameOver ? turn : L.inProgress;
   const totalMoves = history.length;
   games.unshift({
     date: `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`,
@@ -492,7 +496,9 @@ function saveCurrentGame(){
   });
   localStorage.setItem('gomokuGames', JSON.stringify(games));
   renderGameHistory();
-  saveGameBtn.style.display = 'none'; // Hide after saving to prevent duplicates
+  if (gameOver) {
+    saveGameBtn.style.display = 'none'; // Hide after saving a finished game
+  }
 }
 
 function renderGameHistory(){
@@ -506,9 +512,10 @@ function renderGameHistory(){
   games.forEach((game, index) => {
     const item = document.createElement('div');
     item.className = 'historyItem';
+    const statusText = (game.winner === 'X' || game.winner === 'O') ? `${game.winner}${L.wins}` : game.winner;
     item.innerHTML = `
       <strong>${game.date}</strong>
-      <span>${game.boardSize}x${game.boardSize} / ${game.totalMoves}${L.moves} / ${game.winner}${L.wins}</span>
+      <span>${game.boardSize}x${game.boardSize} / ${game.totalMoves}${L.moves} / ${statusText}</span>
     `;
     item.onclick = () => startReplay(index);
     gameHistoryListEl.appendChild(item);
