@@ -9,8 +9,9 @@
     body { margin: 0; padding: 16px; box-sizing: border-box; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: #f5f5f5; color: #222; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     h1 { font-size: 20px; margin: 0; font-weight: 600; }
-    .app { display: grid; gap: 16px; grid-template-columns: 1fr; max-width: 1000px; margin: 0 auto; }
+    .app { display: grid; gap: 16px; grid-template-columns: 1fr; max-width: 1280px; margin: 0 auto; }
     @media (min-width: 960px) { .app { grid-template-columns: max-content 1fr; align-items: start; } }
+    @media (min-width: 1280px) { .app { grid-template-columns: max-content 1fr 1fr; } }
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
     input[type="number"], input[type="file"], button, select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid #aaa; background: #fff; color: #222; }
     button { cursor: pointer; }
@@ -26,6 +27,7 @@
     .stone.O { color:#000; background: #fff; border: 1px solid #000; }
     .stone.X { background: #000; }
     .coordLabel { position: absolute; font-size: 12px; color: #000; user-select: none; pointer-events: none; }
+    .side-panels { display: grid; gap: 12px; }
     .side { display: grid; gap: 12px; }
     .panel { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 12px; }
     .panel h2 { font-size: 16px; margin: 0 0 8px; }
@@ -55,6 +57,19 @@
     .gameHistoryList { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 5px; margin-bottom: 12px; }
     .historyItem { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .historyItem:hover { background-color: #f0f0f0; border-color: #aaa; }
+    .historyItem .deleteBtn {
+      padding: 2px 6px;
+      font-size: 12px;
+      background-color: #e53935; /* Red */
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-left: auto; /* Pushes the button to the right */
+    }
+    .historyItem .deleteBtn:hover {
+      background-color: #c62828; /* Darker Red */
+    }
     .historyItem strong { font-size: 14px; }
     .historyItem span { font-size: 12px; color: #555; }
   </style>
@@ -72,27 +87,29 @@
   </header>
 
   <div class="app">
-    <div class="left">
-      <div class="toolbar" id="mainControls">
-        <label id="sizeLabel">Board size:<input id="sizeInput" type="number" min="5" max="40" step="1" value="15"></label>
-        <button id="newBoardBtn">New Board</button>
-        <span class="badge" id="turnBadge"><span class="turnStone black"></span> Turn: Black (X)</span>
-        <button id="undoBtn">Undo</button>
-        <button id="saveGameBtn" style="display:none;">Save Game</button>
-      </div>
-      <div class="toolbar" id="replayControls" style="display:none;">
-        <button id="replayStartBtn">|&lt;</button>
-        <button id="replayPrevBtn">&lt;</button>
-        <button id="replayNextBtn">&gt;</button>
-        <button id="replayEndBtn">&gt;|</button>
-        <button id="replayExitBtn">Exit Replay</button>
-      </div>
-      <div class="boardWrap">
-        <div id="board" class="board"></div>
+    <div class="main-content">
+      <div class="left">
+        <div class="toolbar" id="mainControls">
+          <label id="sizeLabel">Board size:<input id="sizeInput" type="number" min="5" max="40" step="1" value="15"></label>
+          <button id="newBoardBtn">New Board</button>
+          <span class="badge" id="turnBadge"><span class="turnStone black"></span> Turn: Black (X)</span>
+          <button id="undoBtn">Undo</button>
+          <button id="saveGameBtn" style="display:none;">Save Game</button>
+        </div>
+        <div class="toolbar" id="replayControls" style="display:none;">
+          <button id="replayStartBtn">|&lt;</button>
+          <button id="replayPrevBtn">&lt;</button>
+          <button id="replayNextBtn">&gt;</button>
+          <button id="replayEndBtn">&gt;|</button>
+          <button id="replayExitBtn">Exit Replay</button>
+        </div>
+        <div class="boardWrap">
+          <div id="board" class="board"></div>
+        </div>
       </div>
     </div>
 
-    <div class="side">
+    <div class="side-panels">
       <div class="panel">
         <h2 id="textPanelTitle">Plain Text</h2>
         <textarea id="txt" class="txt" spellcheck="false"></textarea>
@@ -110,6 +127,9 @@
           <button id="loadFileBtn" disabled>Load File</button>
         </div>
       </div>
+    </div>
+
+    <div class="side">
       <div class="panel">
         <h2 id="historyPanelTitle">Game History (localStorage)</h2>
         <div id="gameHistoryList" class="gameHistoryList"></div>
@@ -158,9 +178,9 @@ const replayControlsEl = document.getElementById('replayControls');
 
 // i18n Strings
 const i18n={
-  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜", inProgress:"进行中"},
-  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins", inProgress:"In Progress"},
-  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち", inProgress:"進行中"}
+  CN:{title:"五子棋（纯文本保存 / 载入）",size:"棋盘大小：",newBoard:"新建棋盘",undo:"悔棋",textPanel:"纯文本表示",filePanel:"保存 / 载入文件",syncFrom:"棋盘 → 文本",syncTo:"文本 → 棋盘",copy:"复制文本",download:"下载为 .txt",load:"载入所选文件",turnX:"轮到：黑(X)",turnO:"轮到：白(O)",winX:"黑(X) 获胜!",winO:"白(O) 获胜!",ok:"确定", saveGame:"保存对局", historyPanel:"对局历史 (localStorage)", clearHistory:"清空历史", replayExit:"退出回放", noHistory:"暂无历史对局", clearHistoryConfirm:"确定要清空所有对局历史吗？", moves:"手", wins:"胜", inProgress:"进行中", delete:"删除", deleteConfirm:"确定要删除这个对局吗？"},
+  EN:{title:"Gomoku (Save/Load as Plain Text)",size:"Board size:",newBoard:"New Board",undo:"Undo",textPanel:"Plain Text",filePanel:"Save / Load File",syncFrom:"Board → Text",syncTo:"Text → Board",copy:"Copy Text",download:"Download .txt",load:"Load File",turnX:"Turn: Black (X)",turnO:"Turn: White (O)",winX:"Black (X) wins!",winO:"White (O) wins!",ok:"OK", saveGame:"Save Game", historyPanel:"Game History (localStorage)", clearHistory:"Clear History", replayExit:"Exit Replay", noHistory:"No game history", clearHistoryConfirm:"Are you sure you want to clear all game history?", moves:" moves", wins:" wins", inProgress:"In Progress", delete:"Delete", deleteConfirm:"Are you sure you want to delete this game?"},
+  JP:{title:"五目並べ（テキスト保存/読み込み）",size:"盤のサイズ：",newBoard:"新しい盤",undo:"一手戻す",textPanel:"テキスト表示",filePanel:"保存 / 読み込み",syncFrom:"盤 → テキスト",syncTo:"テキスト → 盤",copy:"テキストをコピー",download:".txtをダウンロード",load:"ファイルを読み込み",turnX:"次：黒(X)",turnO:"次：白(O)",winX:"黒(X) 勝ち!",winO:"白(O) 勝ち!",ok:"OK", saveGame:"対局を保存", historyPanel:"対局履歴 (localStorage)", clearHistory:"履歴を消去", replayExit:"再生終了", noHistory:"対局履歴がありません", clearHistoryConfirm:"本当に対局履歴をすべて消去しますか？", moves:"手", wins:"勝ち", inProgress:"進行中", delete:"削除", deleteConfirm:"この対局を削除してもよろしいですか？"}
 };
 
 // ======= Language & UI =======
@@ -513,11 +533,32 @@ function renderGameHistory(){
     const item = document.createElement('div');
     item.className = 'historyItem';
     const statusText = (game.winner === 'X' || game.winner === 'O') ? `${game.winner}${L.wins}` : game.winner;
-    item.innerHTML = `
+    
+    const info = document.createElement('div');
+    info.innerHTML = `
       <strong>${game.date}</strong>
+      <br>
       <span>${game.boardSize}x${game.boardSize} / ${game.totalMoves}${L.moves} / ${statusText}</span>
     `;
-    item.onclick = () => startReplay(index);
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'deleteBtn';
+    deleteBtn.textContent = L.delete;
+    deleteBtn.onclick = (event) => {
+      event.stopPropagation(); // Prevent triggering the replay
+      deleteGameHistoryItem(index);
+    };
+    
+    item.appendChild(info);
+    item.appendChild(deleteBtn);
+    
+    item.onclick = (event) => {
+      // Ensure the click is not on the delete button itself
+      if (event.target !== deleteBtn) {
+        startReplay(index);
+      }
+    };
+    
     gameHistoryListEl.appendChild(item);
   });
 }
@@ -526,6 +567,16 @@ function clearGameHistory(){
   const L = i18n[langSelect.value] || i18n.EN;
   if (confirm(L.clearHistoryConfirm)) {
     localStorage.removeItem('gomokuGames');
+    renderGameHistory();
+  }
+}
+
+function deleteGameHistoryItem(index) {
+  const L = i18n[langSelect.value] || i18n.EN;
+  if (confirm(L.deleteConfirm)) {
+    const games = getSavedGames();
+    games.splice(index, 1);
+    localStorage.setItem('gomokuGames', JSON.stringify(games));
     renderGameHistory();
   }
 }
