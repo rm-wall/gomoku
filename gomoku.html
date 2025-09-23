@@ -275,46 +275,40 @@ function renderBoard(renderData = { board, history }){
     const x=i*CELL+HALF;
     const hLine=document.createElement('div');
     hLine.className='line h';
-    hLine.style.left=HALF+'px';
-    hLine.style.top=y+'px';
     hLine.style.width=INNER+'px';
+    hLine.style.transform = `translate(${HALF}px, ${y}px)`;
     boardEl.appendChild(hLine);
 
     const vLine=document.createElement('div');
     vLine.className='line v';
-    vLine.style.top=HALF+'px';
-    vLine.style.left=x+'px';
     vLine.style.height=INNER+'px';
+    vLine.style.transform = `translate(${x}px, ${HALF}px)`;
     boardEl.appendChild(vLine);
   }
 
   // Borders
   const topBorder=document.createElement('div');
   topBorder.className='line border h';
-  topBorder.style.left=HALF+'px';
-  topBorder.style.top=HALF+'px';
   topBorder.style.width=INNER+'px';
+  topBorder.style.transform = `translate(${HALF}px, ${HALF}px)`;
   boardEl.appendChild(topBorder);
 
   const bottomBorder=document.createElement('div');
   bottomBorder.className='line border h';
-  bottomBorder.style.left=HALF+'px';
-  bottomBorder.style.top=((size-1)*CELL+HALF)+'px';
   bottomBorder.style.width=INNER+'px';
+  bottomBorder.style.transform = `translate(${HALF}px, ${(size-1)*CELL+HALF}px)`;
   boardEl.appendChild(bottomBorder);
 
   const leftBorder=document.createElement('div');
   leftBorder.className='line border v';
-  leftBorder.style.top=HALF+'px';
-  leftBorder.style.left=HALF+'px';
   leftBorder.style.height=INNER+'px';
+  leftBorder.style.transform = `translate(${HALF}px, ${HALF}px)`;
   boardEl.appendChild(leftBorder);
 
   const rightBorder=document.createElement('div');
   rightBorder.className='line border v';
-  rightBorder.style.top=HALF+'px';
-  rightBorder.style.left=((size-1)*CELL+HALF)+'px';
   rightBorder.style.height=INNER+'px';
+  rightBorder.style.transform = `translate(${(size-1)*CELL+HALF}px, ${HALF}px)`;
   boardEl.appendChild(rightBorder);
 
   // Draw a center dot for visual reference, common on physical boards.
