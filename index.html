@@ -19,7 +19,7 @@
     input[type="number"], input[type="file"], button, select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid #aaa; background: #fff; color: #222; }
     button { cursor: pointer; }
     button:disabled { background-color: #f0f0f0; color: #aaa; cursor: not-allowed; }
-    .boardWrap { background: #fff; padding: 32px; border-radius: 8px; border: 1px solid #ccc; }
+    .boardWrap { background: #fff; padding: 32px 32px 50px 32px; border-radius: 8px; border: 1px solid #ccc; }
     .board { position: relative; width: calc(var(--size) * var(--cell)); height: calc(var(--size) * var(--cell)); background: #fdfdfd; }
     .line { position: absolute; background: #888; }
     .line.h { height: 1px; }
@@ -308,26 +308,26 @@ function renderBoard(renderData = { board, history }){
   // Borders
   const topBorder=document.createElement('div');
   topBorder.className='line border h';
-  topBorder.style.width=INNER+'px';
-  topBorder.style.transform = `translate(${HALF}px, ${HALF}px)`;
+  topBorder.style.width=(INNER + 2)+'px';
+  topBorder.style.transform = `translate(${HALF - 1}px, ${HALF - 1}px)`;
   boardEl.appendChild(topBorder);
 
   const bottomBorder=document.createElement('div');
   bottomBorder.className='line border h';
-  bottomBorder.style.width=INNER+'px';
-  bottomBorder.style.transform = `translate(${HALF}px, ${(size-1)*CELL+HALF}px)`;
+  bottomBorder.style.width=(INNER + 2)+'px';
+  bottomBorder.style.transform = `translate(${HALF - 1}px, ${(size-1)*CELL+HALF - 1}px)`;
   boardEl.appendChild(bottomBorder);
 
   const leftBorder=document.createElement('div');
   leftBorder.className='line border v';
-  leftBorder.style.height=INNER+'px';
-  leftBorder.style.transform = `translate(${HALF}px, ${HALF}px)`;
+  leftBorder.style.height=(INNER + 2)+'px';
+  leftBorder.style.transform = `translate(${HALF - 1}px, ${HALF - 1}px)`;
   boardEl.appendChild(leftBorder);
 
   const rightBorder=document.createElement('div');
   rightBorder.className='line border v';
-  rightBorder.style.height=INNER+'px';
-  rightBorder.style.transform = `translate(${(size-1)*CELL+HALF}px, ${HALF}px)`;
+  rightBorder.style.height=(INNER + 2)+'px';
+  rightBorder.style.transform = `translate(${(size-1)*CELL+HALF - 1}px, ${HALF - 1}px)`;
   boardEl.appendChild(rightBorder);
 
   // Draw a center dot for visual reference, common on physical boards.
@@ -342,21 +342,39 @@ function renderBoard(renderData = { board, history }){
     boardEl.appendChild(dot);
   }
 
-  // Coordinate labels (Top: A.., Left: 1..)
+  // Coordinate labels (All 4 sides)
   for(let i=0;i<size;i++){
+    // Top (A, B, ...)
     const labelTop=document.createElement('div');
     labelTop.className='coordLabel';
     labelTop.style.left=(i*CELL+HALF-4)+'px';
     labelTop.style.top=(HALF-28)+'px';
-    labelTop.textContent=String.fromCharCode(65+i); // A,B,C...
+    labelTop.textContent=String.fromCharCode(65+i);
     boardEl.appendChild(labelTop);
 
+    // Bottom (A, B, ...)
+    const labelBottom=document.createElement('div');
+    labelBottom.className='coordLabel';
+    labelBottom.style.left=(i*CELL+HALF-4)+'px';
+    labelBottom.style.top=((size-1)*CELL+HALF+20)+'px';
+    labelBottom.textContent=String.fromCharCode(65+i);
+    boardEl.appendChild(labelBottom);
+
+    // Left (1, 2, ...)
     const labelLeft=document.createElement('div');
     labelLeft.className='coordLabel';
     labelLeft.style.top=(i*CELL+HALF-6)+'px';
     labelLeft.style.left=(HALF-28)+'px';
     labelLeft.textContent=(i+1);
     boardEl.appendChild(labelLeft);
+
+    // Right (1, 2, ...)
+    const labelRight=document.createElement('div');
+    labelRight.className='coordLabel';
+    labelRight.style.top=(i*CELL+HALF-6)+'px';
+    labelRight.style.left=((size-1)*CELL+HALF+20)+'px';
+    labelRight.textContent=(i+1);
+    boardEl.appendChild(labelRight);
   }
 
   // Stones (with step numbers)
