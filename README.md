@@ -12,7 +12,7 @@ This is a classic Gomoku web game written entirely by AI.
 
 You can play the game directly at the following link:
 
-[Click here to play](https://rm-wall.github.io/gomoku/gomoku.html)
+[Click here to play](https://rm-wall.github.io/gomoku/)
 
 ## 룰 Game Rules
 
