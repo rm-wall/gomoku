@@ -184,6 +184,7 @@ let gameOver = false;
 let isReplaying = false;
 let replayHistory = [];
 let replayStep = -1;
+let replayInitialBoard = [];
 
 // DOM References
 const boardEl=document.getElementById('board');
@@ -655,10 +656,16 @@ function setupReplay(gameData) {
 
   const { n, grid, newHistory } = textToBoard(gameData);
 
+  const initialBoard = JSON.parse(JSON.stringify(grid)); // Deep copy
+  for (const move of newHistory) {
+    initialBoard[move.r][move.c] = '.';
+  }
+
   isReplaying = true;
   replayHistory = newHistory;
   replayStep = newHistory.length - 1; // Set step to the end for replay controls
   size = n;
+  replayInitialBoard = initialBoard; // Store the initial board
   
   document.documentElement.style.setProperty('--size', String(n));
   
@@ -685,7 +692,7 @@ function exitReplay() {
 }
 
 function renderReplayStep() {
-  const tempBoard = Array.from({length:size},()=>Array.from({length:size},()=>'.'));
+  const tempBoard = JSON.parse(JSON.stringify(replayInitialBoard));
   const tempHistory = replayHistory.slice(0, replayStep + 1);
   
   for(const move of tempHistory) {
