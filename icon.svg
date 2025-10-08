@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#f4e4c1" rx="64"/>
+
+  <!-- Board grid -->
+  <g stroke="#8b6914" stroke-width="3" stroke-linecap="round">
+    <!-- Horizontal lines -->
+    <line x1="100" y1="150" x2="412" y2="150"/>
+    <line x1="100" y1="206" x2="412" y2="206"/>
+    <line x1="100" y1="262" x2="412" y2="262"/>
+    <line x1="100" y1="318" x2="412" y2="318"/>
+    <line x1="100" y1="374" x2="412" y2="374"/>
+
+    <!-- Vertical lines -->
+    <line x1="100" y1="150" x2="100" y2="374"/>
+    <line x1="156" y1="150" x2="156" y2="374"/>
+    <line x1="212" y1="150" x2="212" y2="374"/>
+    <line x1="268" y1="150" x2="268" y2="374"/>
+    <line x1="324" y1="150" x2="324" y2="374"/>
+    <line x1="380" y1="150" x2="380" y2="374"/>
+    <line x1="412" y1="150" x2="412" y2="374"/>
+  </g>
+
+  <!-- Center dot -->
+  <circle cx="256" cy="262" r="6" fill="#8b6914"/>
+
+  <!-- Black stones (forming part of winning pattern) -->
+  <g>
+    <circle cx="156" cy="206" r="24" fill="#000"/>
+    <circle cx="212" cy="262" r="24" fill="#000"/>
+    <circle cx="268" cy="318" r="24" fill="#000"/>
+    <circle cx="324" cy="374" r="24" fill="#000"/>
+  </g>
+
+  <!-- White stones -->
+  <g>
+    <circle cx="156" cy="262" r="24" fill="#fff" stroke="#000" stroke-width="2"/>
+    <circle cx="212" cy="318" r="24" fill="#fff" stroke="#000" stroke-width="2"/>
+    <circle cx="268" cy="206" r="24" fill="#fff" stroke="#000" stroke-width="2"/>
+  </g>
+
+  <!-- Highlight on last black stone -->
+  <circle cx="324" cy="374" r="24" fill="none" stroke="#ff4444" stroke-width="3" opacity="0.8"/>
+</svg>
